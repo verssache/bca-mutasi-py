@@ -5,7 +5,7 @@ Script cek saldo dan mutasi BCA melalui API dari klikbca
 ## Cara Penggunaan
 ```
 git clone https://github.com/verssache/BCA-Mutasi-Python
-cd BCA-Mutasi
+cd BCA-Mutasi-Python
 py bca.py
 ```
 
