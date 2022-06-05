@@ -10,5 +10,5 @@ py bca.py
 ```
 
 ## Note
-> **Jangan lupa edit pada line 7 dan 8 menjadi username dan password akun klikbca kalian!**
-> **Saldo akhir yang tertera di script termasuk uang mengendap Rp 50.000**
+- **Jangan lupa edit pada line 7 dan 8 menjadi username dan password akun klikbca kalian!**
+- **Saldo akhir yang tertera di script termasuk uang mengendap Rp 50.000**
