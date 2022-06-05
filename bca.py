@@ -56,23 +56,21 @@ class BCA(object):
         find = find.split('align="left">')[1]
         return find
 
+    def __getIp(self):
+        r = requests.get("https://api.ipify.org/?format=json")
+        res = r.json()["ip"]
+        return res
+
     def __login(self):
         api = "https://m.klikbca.com/authentication.do"
-        body = "value%28user_id%29="+self.__userid+"&value%28pswd%29="+self.__pwd + \
-            "&value%28Submit%29=LOGIN&value%28actions%29=login&value%28user_ip%29=&user_ip=&value%28mobile%29=true&value%28browser_info%29=&mobile=true"
+        body = "value(user_id)=" + self.__userid+"&value(pswd)=" + self.__pwd + \
+            "&value(Submit)=LOGIN&value(actions)=login&value(user_ip)=" + self.__getIp() + \
+            "&user_ip=" + self.__getIp() + "&value(mobile)=true&value(browser_info)=Mozilla/5.0 (Linux; Android 5.1.1; SM-G935FD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.101 Safari/537.36&mobile=true"
         r = requests.post(api, data=body, headers={
-            "Host": "m.klikbca.com",
-            "Connection": "close",
-            "Content-Length": str(len(body)),
-            "Cache-Control": "max-age=0",
             "Origin": "https://m.klikbca.com",
-            "Upgrade-Insecure-Requests": "1",
             "Content-Type": "application/x-www-form-urlencoded",
-            "Save-Data": "on",
             "User-Agent": "Mozilla/5.0 (Linux; Android 5.1.1; SM-G935FD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.101 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
             "Referer": "https://m.klikbca.com/login.jsp",
-            "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
         })
         result = r.text
         cook = []
@@ -83,7 +81,7 @@ class BCA(object):
         else:
             cookie = "Cookie-NS-Mklikbca=" + \
                 cook[0]+"; "+"JSESSIONID="+cook[1]+";"
-            f = open("cookies_"+self.__userid+".txt", 'w')
+            f = open("cookies_" + self.__userid+".txt", 'w')
             f.write(cookie)
             f.close()
             self.__cookie = cookie
@@ -100,34 +98,27 @@ class BCA(object):
                 t = self.__timeCustom(self.__date)
                 tdari = t["dari"]
                 tke = t["ke"]
-            if os.path.isfile("cookies_"+self.__userid+".txt") == False:
+            if os.path.isfile("cookies_" + self.__userid+".txt") == False:
                 login = self.__login()
                 if login["status"] == "gagal":
                     return {"status": False, "data": {}, "message": login["msg"]}
 
             api = "https://m.klikbca.com/accountstmt.do?value(actions)=acctstmtview"
-            body = "r1=1&value%28D1%29=0&value%28startDt%29=" + \
-                tdari["d"]+"&value%28startMt%29="+tdari["m"]+"&value%28startYr%29="+tdari["y"] + \
-                "&value%28endDt%29=" + \
-                tke["d"]+"&value%28endMt%29="+tke["m"] + \
-                "&value%28endYr%29="+tke["y"]
+            body = "value(r1)=1&value(D1)=0&value(startDt)=" + \
+                tdari["d"]+"&value(startMt)="+tdari["m"]+"&value(startYr)="+tdari["y"] + \
+                "&value(endDt)=" + \
+                tke["d"]+"&value(endMt)="+tke["m"] + \
+                "&value(endYr)="+tke["y"]
             r = requests.post(api, data=body, headers={
-                "Host": "m.klikbca.com",
-                "Connection": "close",
-                "Content-Length": str(len(body)),
-                "Cache-Control": "max-age=0",
                 "Origin": "https://m.klikbca.com",
-                "Upgrade-Insecure-Requests": "1",
                 "Content-Type": "application/x-www-form-urlencoded",
-                "Save-Data": "on",
                 "User-Agent": "Mozilla/5.0 (Linux; Android 5.1.1; SM-G935FD) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.101 Safari/537.36",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-                "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Referer": "https://m.klikbca.com/accountstmt.do?value(actions)=acct_stmt",
                 "Cookie": self.__cookie
             })
             result = r.text
             if "302 Moved Temporarily" in result:
-                os.unlink("cookies_"+self.__userid+".txt")
+                os.unlink("cookies_" + self.__userid+".txt")
             elif "TRANSAKSI GAGAL" in result:
                 status = True
                 return {"status": False, "data": {}, "message": "Transaksi Gagal"}
